@@ -55,6 +55,7 @@ class ContentStoreSearchResult(DeepSightsIdTitleModel):
         language (Optional[str], optional): The language of the item. Defaults to None.
         publication_date (Optional[datetime], optional): The publication_date of the item's publication. Defaults to None.
         source (Optional[str], optional): The source of the item. Defaults to None.
+        source_id (Optional[str], optional): The ID of the item's source. Defaults to None.
         rank (Optional[int], optional): The final rank of the item in the search results. Defaults to None.
     """
 
@@ -70,6 +71,10 @@ class ContentStoreSearchResult(DeepSightsIdTitleModel):
     source: Optional[str] = Field(
         alias="source_name",
         description="The name of the item's source; may be None.",
+        default=None,
+    )
+    source_id: Optional[str] = Field(
+        description="The ID of the item's source; may be None.",
         default=None,
     )
     rank: Optional[int] = Field(default=None, description="The final rank of the item in the search results.")

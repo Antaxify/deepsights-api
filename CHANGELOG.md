@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v1.6.3 (08-Jan-2026)
+
+Add source_id field to contentstore search results
+
 ## v1.6.2 (19-Dec-2025)
 
 Add taxonomy filtering to topic search in userclient
