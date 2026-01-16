@@ -59,7 +59,7 @@ def test_document_load_basic(ds_client, test_data):
     assert documents[0].file_name is not None
     assert documents[0].file_size > 0
     assert documents[0].external_metadata is not None
-    assert documents[0].file_type is not None
+    assert documents[0].is_binary is not None
     assert documents[0].description is not None
     assert documents[0].publication_date is not None
     assert documents[0].creation_date is not None

@@ -85,7 +85,7 @@ class TestUnifiedTokenRefresh:
 
         new_token = client._refresh_unified_token()
 
-        callback.assert_called_once()
+        callback.assert_called_once_with("initial_token")
         assert new_token == "refreshed_token"
         assert client._unified_token == "refreshed_token"
         # Verify _get_auth_headers reflects the new token
@@ -131,7 +131,7 @@ class TestExecuteWithRefresh:
         """Verify original request is retried with new token after 401."""
         call_count = 0
 
-        def refresh_callback():
+        def refresh_callback(current_token: str):
             return "new_token"
 
         def mock_request():
@@ -153,7 +153,7 @@ class TestExecuteWithRefresh:
         """Verify AuthenticationError after MAX_REFRESH_ATTEMPTS exhausted."""
         refresh_count = 0
 
-        def refresh_callback():
+        def refresh_callback(current_token: str):
             nonlocal refresh_count
             refresh_count += 1
             return f"token_v{refresh_count}"
@@ -172,7 +172,7 @@ class TestExecuteWithRefresh:
     def test_refresh_failure_raises_authentication_error(self):
         """Verify AuthenticationError when refresh callback fails."""
 
-        def refresh_callback():
+        def refresh_callback(current_token: str):
             raise RuntimeError("refresh failed")
 
         def mock_request():
@@ -190,7 +190,7 @@ class TestExecuteWithRefresh:
         request_count = 0
         refresh_count = 0
 
-        def refresh_callback():
+        def refresh_callback(current_token: str):
             nonlocal refresh_count
             refresh_count += 1
             return None  # Signal permanent failure
@@ -218,7 +218,7 @@ class TestHTTPMethodOverrides:
         call_count = 0
         captured_headers: list = []
 
-        def refresh_callback():
+        def refresh_callback(current_token: str):
             return "refreshed_token"
 
         client = MockUnifiedClient(unified_token="initial_token", refresh_callback=refresh_callback)
@@ -246,7 +246,7 @@ class TestHTTPMethodOverrides:
         call_count = 0
         captured_headers: list = []
 
-        def refresh_callback():
+        def refresh_callback(current_token: str):
             return "refreshed_token"
 
         client = MockUnifiedClient(unified_token="initial_token", refresh_callback=refresh_callback)
@@ -366,7 +366,7 @@ class TestThreadSafety:
             def __exit__(self, *args):
                 return self._lock.__exit__(*args)
 
-        def refresh_callback():
+        def refresh_callback(current_token: str):
             nonlocal refresh_count
             refresh_count += 1
             return f"token_v{refresh_count}"
@@ -385,7 +385,7 @@ class TestThreadSafety:
         """Verify redundant refresh is skipped if another thread already refreshed."""
         refresh_count = 0
 
-        def refresh_callback():
+        def refresh_callback(current_token: str):
             nonlocal refresh_count
             refresh_count += 1
             return f"token_v{refresh_count}"
@@ -407,7 +407,7 @@ class TestThreadSafety:
         """Verify refresh proceeds when current token matches the failed token."""
         refresh_count = 0
 
-        def refresh_callback():
+        def refresh_callback(current_token: str):
             nonlocal refresh_count
             refresh_count += 1
             return f"token_v{refresh_count}"
@@ -427,7 +427,7 @@ class TestThreadSafety:
         refresh_started = threading.Event()
         refresh_can_complete = threading.Event()
 
-        def slow_refresh_callback():
+        def slow_refresh_callback(current_token: str):
             nonlocal refresh_count
             refresh_started.set()
             refresh_can_complete.wait(timeout=5)

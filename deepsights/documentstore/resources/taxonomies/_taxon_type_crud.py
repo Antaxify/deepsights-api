@@ -48,16 +48,13 @@ def taxon_type_create(
     assert taxonomy_id, "Taxonomy ID is required."
     assert name, "Taxon type name is required."
 
-    body: dict = {"name": name}
+    body: dict = {"taxonomy_id": taxonomy_id, "name": name}
     if description:
         body["description"] = description
     if external_id:
         body["external_id"] = external_id
 
-    result = resource.api.post(
-        f"{BASE_PATH}/custom-taxonomies/{taxonomy_id}/taxon-types",
-        body=body,
-    )
+    result = resource.api.post(f"{BASE_PATH}/custom-taxon-types", body=body)
     return TaxonType.model_validate(result)
 
 

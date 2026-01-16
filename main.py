@@ -108,7 +108,7 @@ cs_hybrid_results = ds.contentstore.secondary.search(
 print("=== Unified Token Authentication ===")
 
 
-def example_refresh_callback():
+def example_refresh_callback(current_token: str):
     """
     Example refresh callback - replace with your actual token refresh logic.
 
@@ -119,7 +119,11 @@ def example_refresh_callback():
         None: To signal permanent auth failure (stops retrying)
     """
     # In a real implementation, you would call your auth server here:
-    # response = requests.post("https://auth.example.com/token", timeout=10)
+    # response = requests.post(
+    #     "https://auth.example.com/token",
+    #     data={"refresh_token": current_token},
+    #     timeout=10,
+    # )
     # return response.json()["access_token"]
 
     # For demo purposes, return a placeholder

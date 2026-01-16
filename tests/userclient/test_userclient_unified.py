@@ -21,7 +21,7 @@ class TestUserClientConstructorValidation:
             UserClient(
                 oauth_token="test_oauth",
                 unified_token="test_unified",
-                refresh_callback=lambda: "new",
+                refresh_callback=lambda _token: "new",
             )
         assert "exactly one of" in str(exc.value)
 
@@ -31,7 +31,7 @@ class TestUserClientConstructorValidation:
                 email="test@example.com",
                 api_key="test_key",
                 unified_token="test_unified",
-                refresh_callback=lambda: "new",
+                refresh_callback=lambda _token: "new",
             )
         assert "exactly one of" in str(exc.value)
 
@@ -147,7 +147,7 @@ class TestUserClientUnifiedTokenRefresh:
         call_count = 0
         refresh_call_count = 0
 
-        def refresh_callback():
+        def refresh_callback(current_token: str):
             nonlocal refresh_call_count
             refresh_call_count += 1
             return "refreshed_token"

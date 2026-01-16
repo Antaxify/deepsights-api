@@ -439,9 +439,9 @@ import deepsights
 from deepsights.contentstore import ContentStore
 from deepsights.userclient import UserClient
 
-def my_refresh_callback():
-    # Your logic to obtain a new token (must implement timeout!)
-    new_token = get_token_from_auth_server(timeout=10)
+def my_refresh_callback(current_token: str):
+    # Your logic to obtain a new token using the current token (must implement timeout!)
+    new_token = get_token_from_auth_server(current_token, timeout=10)
     return new_token  # Return None to signal permanent auth failure
 
 # Option 1: Via main DeepSights client (for ContentStore)

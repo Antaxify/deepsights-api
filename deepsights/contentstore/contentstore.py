@@ -45,7 +45,7 @@ class ContentStore(UnifiedTokenMixin, APIKeyAPI):
         api_key: str | None = None,
         endpoint_base: str | None = None,
         unified_token: str | None = None,
-        refresh_callback: Optional[Callable[[], Optional[str]]] = None,
+        refresh_callback: Optional[Callable[[str], Optional[str]]] = None,
     ) -> None:
         """
         Initializes the API client.
@@ -60,8 +60,8 @@ class ContentStore(UnifiedTokenMixin, APIKeyAPI):
                 Mutually exclusive with api_key.
             refresh_callback (Callable, optional): Callback function that returns a new
                 token string, or None to signal permanent auth failure (stops retrying).
-                Required when using unified_token. The callback MUST implement its own
-                timeout to avoid blocking indefinitely.
+                Required when using unified_token. The callback receives the current
+                unified token and MUST implement its own timeout to avoid blocking indefinitely.
 
         Raises:
             ValueError: If both api_key and unified_token are provided, or if neither
@@ -107,7 +107,7 @@ class ContentStore(UnifiedTokenMixin, APIKeyAPI):
     def with_unified_token(
         cls,
         unified_token: str,
-        refresh_callback: Callable[[], Optional[str]],
+        refresh_callback: Callable[[str], Optional[str]],
         endpoint_base: str | None = None,
     ) -> "ContentStore":
         """
@@ -116,8 +116,9 @@ class ContentStore(UnifiedTokenMixin, APIKeyAPI):
         Args:
             unified_token: Bearer token string for authentication.
             refresh_callback: Callback function that returns a new token on 401,
-                or None to signal permanent failure (stops retrying). Must implement
-                its own timeout to avoid blocking indefinitely.
+                or None to signal permanent failure (stops retrying). Receives the
+                current unified token and must implement its own timeout to avoid blocking
+                indefinitely.
             endpoint_base: Optional custom endpoint base URL.
 
         Returns:

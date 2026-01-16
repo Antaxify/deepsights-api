@@ -58,14 +58,14 @@ class UnifiedTokenMixin:
 
     # Type hints for attributes (set by __init_unified_token__)
     _unified_token: str
-    _refresh_callback: Callable[[], Optional[str]]
+    _refresh_callback: Callable[[str], Optional[str]]
     _unified_token_lock: threading.Lock
     _unified_token_mode: bool
 
     def __init_unified_token__(
         self,
         unified_token: str,
-        refresh_callback: Callable[[], Optional[str]],
+        refresh_callback: Callable[[str], Optional[str]],
     ) -> None:
         """
         Initialize unified token authentication.
@@ -78,7 +78,7 @@ class UnifiedTokenMixin:
             refresh_callback: A callable that returns a new token string, or None
                 to signal permanent authentication failure (no further retries).
                 The callback should handle obtaining a fresh token (e.g., by
-                exchanging a refresh token). It takes no arguments.
+                exchanging a refresh token). It receives the current unified token.
 
                 Return values:
                     - str: New valid token - will be used for retry
@@ -89,11 +89,11 @@ class UnifiedTokenMixin:
                 A hung callback will hold the refresh lock and block all other
                 threads attempting to refresh. Example with timeout::
 
-                    def my_refresh_callback():
+                    def my_refresh_callback(current_token: str):
                         try:
                             response = requests.post(
                                 "https://auth.example.com/token",
-                                data={"refresh_token": my_refresh_token},
+                                data={"refresh_token": current_token},
                                 timeout=10  # Always set a timeout!
                             )
                             return response.json()["access_token"]
@@ -149,7 +149,8 @@ class UnifiedTokenMixin:
 
             logger.debug("Refreshing unified token via callback")
             try:
-                new_token = self._refresh_callback()
+                token_for_refresh = failed_token if failed_token is not None else self._unified_token
+                new_token = self._refresh_callback(token_for_refresh)
 
                 # None signals permanent failure - don't retry
                 if new_token is None:

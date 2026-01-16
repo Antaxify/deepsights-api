@@ -50,7 +50,7 @@ class DeepSights(APIKeyAPI):
         ds_endpoint_base: Optional[str] = None,
         cs_endpoint_base: Optional[str] = None,
         cs_unified_token: Optional[str] = None,
-        cs_refresh_callback: Optional[Callable[[], Optional[str]]] = None,
+        cs_refresh_callback: Optional[Callable[[str], Optional[str]]] = None,
     ) -> None:
         """
         Initializes the DeepSights API client.
@@ -66,7 +66,7 @@ class DeepSights(APIKeyAPI):
             cs_unified_token (str, optional): Unified token for ContentStore authentication.
                 Mutually exclusive with cs_api_key.
             cs_refresh_callback (Callable, optional): Callback for refreshing cs_unified_token.
-                Required when using cs_unified_token.
+                Required when using cs_unified_token. Receives the current unified token.
         """
         super().__init__(
             endpoint_base=ds_endpoint_base or ENDPOINT_BASE,

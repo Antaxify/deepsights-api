@@ -54,7 +54,7 @@ def taxon_create(
     assert taxon_type_id, "Taxon type ID is required."
     assert name, "Taxon name is required."
 
-    body: dict = {"name": name}
+    body: dict = {"taxonomy_id": taxonomy_id, "taxon_type_id": taxon_type_id, "name": name}
     if description:
         body["description"] = description
     if parent_ids:
@@ -62,10 +62,7 @@ def taxon_create(
     if external_id:
         body["external_id"] = external_id
 
-    result = resource.api.post(
-        f"{BASE_PATH}/custom-taxonomies/{taxonomy_id}/taxon-types/{taxon_type_id}/taxons",
-        body=body,
-    )
+    result = resource.api.post(f"{BASE_PATH}/custom-taxons", body=body)
     return Taxon.model_validate(result)
 
 
@@ -157,7 +154,7 @@ def taxon_search(
     if external_ids:
         body["external_ids"] = external_ids
 
-    result = resource.api.post(f"{BASE_PATH}/custom-taxonomies/_search-taxons", body=body)
+    result = resource.api.post(f"{BASE_PATH}/custom-taxons/_search", body=body)
 
     total = result.get("total", 0)
     # API returns items wrapped in {"taxon": {...}} structure

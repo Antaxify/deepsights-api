@@ -2,6 +2,14 @@
 
 <!--next-version-placeholder-->
 
+## v1.7.0 (16-Jan-2026)
+
+- Unified token refresh callbacks now receive the current unified token as a parameter.
+- Update unified token examples and tests to use the new callback signature.
+- Update taxonomy taxon search endpoint path after API refactor.
+- Update taxonomy taxon type/taxon creation endpoints after API refactor.
+- Replace document file_type with is_binary for consistent binary detection across clients.
+
 ## v1.6.3 (08-Jan-2026)
 
 Add source_id field to contentstore search results

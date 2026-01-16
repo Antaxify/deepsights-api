@@ -178,6 +178,7 @@ class Document(DeepSightsIdTitleModel):
         description (str, optional): The description of the document.
         publication_date (datetime, optional): The publication date of the document.
         creation_date (datetime, optional): The creation date of the document.
+        is_binary (bool, optional): Whether the artifact has a binary payload.
         page_ids (List[str], optional): The list of page IDs in the document.
         number_of_pages (int, optional): The total number of pages in the document.
     """
@@ -209,8 +210,9 @@ class Document(DeepSightsIdTitleModel):
         default=None,
         description="The total number of pages in the document.",
     )
-    file_type: Optional[str] = Field(
-        description="The class of artifact [ORIGINAL_PDF, CONVERTIBLE_TO_PDF, NON_BINARY]", alias="type", default=None
+    is_binary: Optional[bool] = Field(
+        description="Whether the artifact has a binary payload.",
+        default=None,
     )
     external_metadata: Optional[ArtifactExternalMetadata] = Field(description="The artifact's metadata", default=None)
     custom_taxonomies_data: List[DocumentTaxonomyData] = Field(default_factory=list, description="Taxonomy assignments for this document.")
@@ -221,6 +223,16 @@ class Document(DeepSightsIdTitleModel):
         publication_data: Dict[str, Any] = kwargs.get("publication_data") or {}
         kwargs.setdefault("creation_date", origin.get("creation_time"))
         kwargs.setdefault("publication_date", publication_data.get("publication_date"))
+        # Derive binary status from artifact type (B2B) or gcs_object_id (end-user)
+        if "is_binary" not in kwargs:
+            artifact_type = kwargs.get("type") or kwargs.get("artifact_type")
+            if artifact_type is not None:
+                kwargs["is_binary"] = artifact_type != "NON_BINARY"
+            else:
+                gcs_object_id = kwargs.get("gcs_object_id")
+                if gcs_object_id is not None:
+                    kwargs["is_binary"] = bool(gcs_object_id)
+
         # Handle null -> empty list for custom_taxonomies_data
         if kwargs.get("custom_taxonomies_data") is None:
             kwargs["custom_taxonomies_data"] = []
